@@ -1,0 +1,14 @@
+# Root
+.env
+
+# IDE
+.vscode/
+.idea/
+
+# js/ts
+node_modules/
+build/
+
+# cs
+bin/
+obj/
