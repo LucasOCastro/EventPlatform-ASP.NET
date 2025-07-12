@@ -1,7 +1,13 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
+import { mergeConfig, type ConfigEnv } from 'vite'
+import baseConfig from './vite.config.base.js'  // your common config
 
-// https://vite.dev/config/
-export default defineConfig({
-  plugins: [react()],
-})
+function getSpecificConfig(mode: string) {
+  return mode === 'development'
+    ? require('./vite.config.dev.js').default
+    : require('./vite.config.prod.js').default
+}
+
+export default ({ mode }: ConfigEnv) => {
+  const specificConfig = getSpecificConfig(mode);
+  return mergeConfig(baseConfig, specificConfig)
+}

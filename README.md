@@ -12,21 +12,12 @@ Event management system made for practice with ASP.NET and React.
 - Backend: http://localhost:5000/swagger
 - Frontend: http://localhost:3000
 
-### Run with Docker Compose
+### Run Build
 ```bash
-docker compose up --build
+docker compose up
 ```
 
-### Run manually
-#### Backend
+### Run Dev
 ```bash
-cd backend/EventPlatform.API
-dotnet run
-```
-
-#### Frontend
-```bash
-cd frontend
-npm install
-npm start
+docker compose up -f docker-compose.yml -f docker-compose.dev.yml
 ```
