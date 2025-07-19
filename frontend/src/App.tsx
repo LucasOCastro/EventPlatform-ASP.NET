@@ -1,23 +1,13 @@
-import { Button } from "@/components/ui/button";
-import { useState } from "react";
 import "./App.css";
+import "@mantine/core/styles.css";
+import { MantineProvider } from "@mantine/core";
+import { RouterProvider } from "react-router";
+import { router } from "@/routes.tsx";
 
-function App() {
-  const [count, setCount] = useState(0);
-
+export default function App() {
   return (
-    <>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <Button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </Button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-    </>
+    <MantineProvider>
+      <RouterProvider router={router} />;
+    </MantineProvider>
   );
 }
-
-export default App;
