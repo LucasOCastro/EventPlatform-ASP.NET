@@ -1,8 +1,8 @@
 import { createBrowserRouter } from "react-router";
 import { Home } from "@/pages/home/Home.tsx";
 import { About } from "@/pages/about/About.tsx";
-import { ErrorPage } from "@/pages/ErrorPage/ErrorPage.tsx";
-import { Root } from "@/components/Root.tsx";
+import { ErrorPage } from "@/pages/error-page/ErrorPage.tsx";
+import { Root } from "@/pages/Root.tsx";
 import type { MyRouteObject, RouteInfo } from "@/types/routes.ts";
 
 const routeRoot: MyRouteObject = {
