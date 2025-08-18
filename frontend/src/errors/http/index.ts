@@ -13,7 +13,7 @@ export const NetworkErrors: Record<number, HttpErrorClass> = Object.fromEntries(
   classes.map((c) => [c.statusCode!, c]),
 );
 
-export function createHttpError(status: number, message?: string) {
+export function makeHttpError(status: number, message?: string) {
   const Ctor = NetworkErrors[status];
   return Ctor
     ? new Ctor(message)
