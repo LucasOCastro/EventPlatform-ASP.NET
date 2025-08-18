@@ -1,10 +1,14 @@
 import { afterEach, vi } from "vitest";
 import { cleanup, render, type RenderOptions } from "@testing-library/react";
 import { MantineProvider } from "@mantine/core";
+import { ModalsProvider } from "@mantine/modals";
 import type { ReactElement } from "react";
 import "@testing-library/jest-dom";
 import "@testing-library/jest-dom/vitest";
-import { ModalsProvider } from "@mantine/modals";
+import createFetchMock from "vitest-fetch-mock";
+
+const fetchMocker = createFetchMock(vi);
+fetchMocker.enableMocks();
 
 // Mock window.matchMedia
 Object.defineProperty(window, "matchMedia", {
