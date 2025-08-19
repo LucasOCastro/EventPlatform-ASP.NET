@@ -1,6 +1,6 @@
 import type { FC } from "react";
 import { useRouteError, Link } from "react-router";
-import { extractErrorInfo } from "@/pages/error-page/errorInfo.ts";
+import { extractErrorInfo } from "@/types/error-info.ts";
 
 export const ErrorPage: FC = () => {
   const error = useRouteError();

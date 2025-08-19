@@ -1,4 +1,4 @@
-import { HttpError } from "./HttpError.ts";
+import { HttpError } from "@/errors";
 
 export class InternalServerError extends HttpError {
   public static statusCode = 500;
