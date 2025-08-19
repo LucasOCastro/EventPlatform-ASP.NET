@@ -6,6 +6,7 @@ import type {
 } from "@/services/request/IRequestService.ts";
 import { NetworkErrors } from "@/errors/http";
 import { TimeoutError } from "@/errors";
+import { ConsoleLoggerService } from "@/services/logger/ConsoleLoggerService.ts";
 
 const URL = "/test/url";
 const BODY = { test: "data" };
@@ -22,7 +23,7 @@ interface VerbTest<Verb extends RequestVerb> {
 describe("FetchRequestService", () => {
   let requestService: IRequestService;
   beforeEach(() => {
-    requestService = new FetchRequestService();
+    requestService = new FetchRequestService(new ConsoleLoggerService());
     fetchMock.resetMocks();
   });
 

@@ -5,10 +5,10 @@ import {
   type PostRequestOptions,
   type PutRequestOptions,
 } from "./IRequestService.ts";
+import { ConnectionError, TimeoutError, makeHttpError } from "@/errors";
+import type { ILogger } from "@/services/logger/ILogger.ts";
 
 const DEFAULT_TIMEOUT = 5 * 1000;
-
-import { ConnectionError, TimeoutError, makeHttpError } from "@/errors";
 
 interface ErrorResponse {
   message: string;
@@ -17,7 +17,12 @@ interface ErrorResponse {
 }
 
 export class FetchRequestService implements IRequestService {
-  public async get<T>(url: string, options?: GetRequestOptions): Promise<T> {
+  private _logger: ILogger;
+  constructor(logger: ILogger) {
+    this._logger = logger;
+  }
+
+  async get<T>(url: string, options?: GetRequestOptions): Promise<T> {
     const { headers = {}, timeout } = options || {};
     return this._request(
       url,
@@ -93,16 +98,14 @@ export class FetchRequestService implements IRequestService {
       const isAbort =
         err && typeof err === "object" && (err as Error).name === "AbortError";
 
-      // TODO logger service
-      console.error(`Fetch error for ${url}:`, err);
+      this._logger.error(`Fetch error for ${url}:`, err);
       throw isAbort
         ? new TimeoutError("Request timed out: " + url, err)
         : new ConnectionError("Network error while fetching: " + url, err);
     }
 
     if (!res.ok) {
-      // TODO logger service
-      console.error(`Request failed for ${url}:`, res);
+      this._logger.error(`Request failed for ${url}:`, res);
       throw await this._makeHttpError(res);
     }
 
@@ -111,8 +114,7 @@ export class FetchRequestService implements IRequestService {
     try {
       return res.json();
     } catch (err) {
-      // TODO custom logger
-      console.error(`Invalid JSON response from ${url}:`, err);
+      this._logger.error(`Invalid JSON response from ${url}:`, err);
       throw new Error(
         `Invalid JSON response (status ${res.status}) from ${url}`,
       );
