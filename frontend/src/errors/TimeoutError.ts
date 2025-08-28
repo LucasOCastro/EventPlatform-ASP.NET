@@ -1,4 +1,5 @@
-import { ConnectionError } from "@/errors/ConnectionError.ts";
+// noinspection ES6PreferShortImport
+import { ConnectionError } from "./ConnectionError";
 
 export class TimeoutError extends ConnectionError {
   constructor(message = "Request timed out", cause?: unknown) {

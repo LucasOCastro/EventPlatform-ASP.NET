@@ -1,4 +1,5 @@
-import { HttpError } from "@/errors";
+// noinspection ES6PreferShortImport
+import { HttpError } from "./HttpError";
 
 export class ConflictError extends HttpError {
   public static statusCode = 409;

@@ -20,4 +20,4 @@ export function makeHttpError(status: number, message?: string) {
     : new HttpError(status, message ?? `HTTP ${status}`);
 }
 
-export { HttpError } from "./HttpError";
+export * from "./HttpError";
