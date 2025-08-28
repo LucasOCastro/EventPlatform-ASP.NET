@@ -6,6 +6,7 @@ import type { ReactElement } from "react";
 import "@testing-library/jest-dom";
 import "@testing-library/jest-dom/vitest";
 import createFetchMock from "vitest-fetch-mock";
+import "@/plugins/setup";
 
 const fetchMocker = createFetchMock(vi);
 fetchMocker.enableMocks();
