@@ -8,7 +8,8 @@ describe("userProfileSchema", () => {
   testSchema(userProfileSchema, {
     id: { happy: [5, 1000, 0], sad: [-12, null, "asd"] },
     email: { happy: [VALID_EMAIL], sad: [INVALID_EMAIL, ""] },
-    name: { happy: ["user"], sad: [null] },
+    firstName: { happy: ["user"], sad: [null, ""] },
+    lastName: { happy: ["name"], sad: [null, ""] },
     profilePictureUrl: {
       happy: ["https://url.com", "http://url.com", undefined],
     },

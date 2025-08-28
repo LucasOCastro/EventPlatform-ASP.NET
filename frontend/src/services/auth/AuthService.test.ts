@@ -8,10 +8,12 @@ import { ZodError } from "zod";
 import { ConflictError } from "@/errors/http/ConflictError.ts";
 import { UnauthorizedError } from "@/errors/http/UnauthorizedError.ts";
 import { vi } from "vitest";
+import dayjs from "dayjs";
 
 const USER: UserProfile = {
   id: 0,
-  name: "test name",
+  firstName: "foo",
+  lastName: "bar mark",
   email: "user@mail.com",
 };
 
@@ -26,7 +28,7 @@ const VALID_REGISTER: RegisterType = {
   confirmPassword: "pass1234!",
   firstName: "user",
   lastName: "name",
-  birthDate: new Date(),
+  birthDate: dayjs().utc().subtract(18, "years").toDate(),
 };
 
 describe("AuthService", () => {
@@ -73,7 +75,7 @@ describe("AuthService", () => {
     requestService.post.mockResolvedValue(USER);
     await authService.login(VALID_LOGIN);
 
-    const UPDATED_USER: UserProfile = { ...USER, name: "updated name" };
+    const UPDATED_USER: UserProfile = { ...USER, firstName: "updated name" };
     requestService.post.mockResolvedValue(UPDATED_USER);
     const result = await authService.login(VALID_LOGIN);
 
