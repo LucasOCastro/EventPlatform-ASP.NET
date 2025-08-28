@@ -1,36 +1,37 @@
 import { LoginForm } from "./LoginForm";
 import type { LoginType } from "@/schemes/auth.schema.ts";
-import { testForm } from "@/tests/forms.tsx";
+import { testForm } from "@/tests/forms";
 
-testForm<LoginType>({
-  name: "LoginForm",
-  component: (onSubmit) => <LoginForm onSubmit={onSubmit} />,
-  submitButton: "login",
-  formShape: {
-    email: { query: { label: "email" } },
-    password: { query: { label: "password" } },
-  },
-  happyPaths: {
-    name: "valid",
-    data: {
-      email: "valid@mail.com",
-      password: "abAB12!",
+describe("LoginForm", () => {
+  testForm<LoginType>({
+    component: (onSubmit) => <LoginForm onSubmit={onSubmit} />,
+    submitButton: "login",
+    formShape: {
+      email: { query: { label: "email" } },
+      password: { query: { label: "password" } },
     },
-  },
-  sadPaths: [
-    {
-      name: "missing email",
+    happyPaths: {
+      name: "valid",
       data: {
-        email: "",
+        email: "valid@mail.com",
         password: "abAB12!",
       },
     },
-    {
-      name: "missing password",
-      data: {
-        email: "valid@mail.com",
-        password: "",
+    sadPaths: [
+      {
+        name: "missing email",
+        data: {
+          email: "",
+          password: "abAB12!",
+        },
       },
-    },
-  ],
+      {
+        name: "missing password",
+        data: {
+          email: "valid@mail.com",
+          password: "",
+        },
+      },
+    ],
+  });
 });
