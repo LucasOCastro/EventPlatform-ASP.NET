@@ -1,3 +1,5 @@
 export interface FormProps<TData> {
-  onSubmit?: (data: TData) => void;
+  onSubmit?: (data: TData) => Promise<void>;
+  isLoading?: boolean;
+  isDisabled?: boolean;
 }

@@ -4,9 +4,10 @@ import { zod4Resolver } from "mantine-form-zod-resolver";
 import { loginSchema, type LoginType } from "@/schemes/auth.schema.ts";
 import { Button, PasswordInput, TextInput } from "@mantine/core";
 import type { FormProps } from "@/types/form-props.ts";
+import { BaseForm } from "@/components/BaseForm.tsx";
 
 export const LoginForm: FC<FormProps<LoginType>> = (props = {}) => {
-  const { onSubmit = () => {} } = props;
+  const { isDisabled, isLoading, onSubmit = () => {} } = props;
   const form = useForm<LoginType>({
     mode: "uncontrolled",
     initialValues: {
@@ -17,7 +18,11 @@ export const LoginForm: FC<FormProps<LoginType>> = (props = {}) => {
   });
 
   return (
-    <form onSubmit={form.onSubmit((data) => onSubmit(loginSchema.parse(data)))}>
+    <BaseForm
+      onSubmit={form.onSubmit((data) => onSubmit(loginSchema.parse(data)))}
+      isDisabled={isDisabled}
+      isLoading={isLoading}
+    >
       <TextInput
         label="Email"
         placeholder="your@email.com"
@@ -31,6 +36,6 @@ export const LoginForm: FC<FormProps<LoginType>> = (props = {}) => {
         {...form.getInputProps("password")}
       />
       <Button type="submit">Login</Button>
-    </form>
+    </BaseForm>
   );
 };

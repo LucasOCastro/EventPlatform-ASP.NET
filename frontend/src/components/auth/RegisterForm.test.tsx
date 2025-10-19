@@ -5,11 +5,11 @@ import {
   type RegisterType,
 } from "@/schemes/auth.schema.ts";
 import { testForm } from "@/tests/forms";
-import { yearsFromDate } from "@/utils/date.ts";
+import dayjs from "dayjs";
 
 describe("RegisterForm", () => {
   testForm<RegisterType>({
-    component: (onSubmit) => <RegisterForm onSubmit={onSubmit} />,
+    component: (props) => <RegisterForm {...props} />,
     submitButton: "register",
     formShape: {
       email: { query: { label: "email" } },
@@ -41,7 +41,7 @@ describe("RegisterForm", () => {
         },
         {
           name: `is younger than ${MIN_AGE}`,
-          data: { birthDate: yearsFromDate(MAX_BIRTH_DATE, 1) },
+          data: { birthDate: dayjs(MAX_BIRTH_DATE).add(1, "years").toDate() },
         },
       ],
     },

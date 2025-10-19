@@ -4,7 +4,7 @@ import { testForm } from "@/tests/forms";
 
 describe("LoginForm", () => {
   testForm<LoginType>({
-    component: (onSubmit) => <LoginForm onSubmit={onSubmit} />,
+    component: (props) => <LoginForm {...props} />,
     submitButton: "login",
     formShape: {
       email: { query: { label: "email" } },
