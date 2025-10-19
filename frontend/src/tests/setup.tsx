@@ -7,6 +7,8 @@ import "@testing-library/jest-dom";
 import "@testing-library/jest-dom/vitest";
 import createFetchMock from "vitest-fetch-mock";
 import "@/plugins/setup";
+import { authServiceMock } from "@/tests/mocks/AuthService.mock.ts";
+import AuthProvider from "@/contexts/AuthProvider.tsx";
 
 const fetchMocker = createFetchMock(vi);
 fetchMocker.enableMocks();
@@ -33,9 +35,11 @@ afterEach(() => {
 function customRender(ui: ReactElement, options?: RenderOptions) {
   return render(ui, {
     wrapper: ({ children }) => (
-      <MantineProvider>
-        <ModalsProvider>{children}</ModalsProvider>
-      </MantineProvider>
+      <AuthProvider authService={authServiceMock}>
+        <MantineProvider>
+          <ModalsProvider>{children}</ModalsProvider>
+        </MantineProvider>
+      </AuthProvider>
     ),
     ...options,
   });
