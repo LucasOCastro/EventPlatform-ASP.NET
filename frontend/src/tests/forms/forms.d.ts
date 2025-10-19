@@ -1,21 +1,10 @@
-import type { Mock } from "vitest";
 import type { ReactElement } from "react";
-
-export type FieldQuery = { label: string } | { role: string; name?: string };
-export type FormShape<TFormData extends object> = {
-  [K in keyof TFormData]: {
-    query: FieldQuery;
-    inputFn?: (element: HTMLElement, value: TFormData[K]) => void;
-  };
-};
-export type FormElements<TFormData extends object> = Record<
-  keyof TFormData,
-  HTMLElement
->;
+import type { FormProps } from "@/types/form-props.ts";
 
 export interface TestPath<TFormData extends object> {
   name: string;
   data: TFormData;
+  renderProps?: Omit<FormProps<TFormData>, "onSubmit">;
 }
 
 export interface SadPathFactory<TFormData extends object> {
@@ -24,7 +13,7 @@ export interface SadPathFactory<TFormData extends object> {
 }
 
 export interface TestFormSettings<TFormData extends object> {
-  component: (onSubmit: Mock) => ReactElement;
+  component: (props: FormProps<TFormData>) => ReactElement;
   formShape: FormShape<TFormData>;
   submitButton: string | FieldQuery;
   happyPaths: TestPath<TFormData>[] | TestPath<TFormData>;

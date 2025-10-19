@@ -1,14 +1,12 @@
-import { fireEvent, render, screen } from "@/tests/setup";
+import { render } from "@/tests/setup";
 import { vi } from "vitest";
 import type {
-  FieldQuery,
-  FormElements,
-  FormShape,
   SadPathFactory,
   TestFormSettings,
   TestPath,
 } from "@/tests/forms/forms.d.tsx";
-import { fillField } from "@/tests/forms/field-filler.ts";
+import type { FormProps } from "@/types/form-props";
+import TestableForm from "@/tests/forms/testable-form";
 
 export function testForm<TFormData extends object>({
   component,
@@ -18,63 +16,123 @@ export function testForm<TFormData extends object>({
   submitButton,
   sadPathFactory,
 }: TestFormSettings<TFormData>) {
+  // Guarantee happyPaths is an array
   if (!Array.isArray(happyPaths)) happyPaths = [happyPaths];
 
+  // Guarantee sadPaths is an array
   if (sadPaths === undefined) sadPaths = [];
   else if (!Array.isArray(sadPaths)) sadPaths = [sadPaths];
 
-  if (sadPathFactory)
-    sadPaths.push(...makeSadPaths(happyPaths[0].data, sadPathFactory));
+  // Fill sadPaths
+  makeSadPaths(sadPathFactory, sadPaths, happyPaths);
 
-  const submitButtonQuery =
-    typeof submitButton === "string"
-      ? { role: "button", name: submitButton }
-      : submitButton;
-
-  const mockOnSubmit = vi.fn((data) =>
+  const mockOnSubmit = vi.fn(async (data: TFormData) =>
     console.log("onSubmit called with:", data),
   );
   beforeEach(() => mockOnSubmit.mockClear());
 
-  it("renders all fields and a submit button", () => {
-    render(component(mockOnSubmit));
+  function renderForm(props: Omit<FormProps<TFormData>, "onSubmit"> = {}) {
+    render(
+      component({
+        onSubmit: mockOnSubmit,
+        ...props,
+      }),
+    );
+  }
 
-    const elements = doFormQuery(formShape);
-    //console.log("found elements = ", elements);
+  const testableForm = new TestableForm(formShape, submitButton);
+
+  it("renders all fields and a submit button", () => {
+    renderForm();
+
+    const elements = testableForm.findAllFields();
     Object.values(elements).forEach((field) => {
       expect(field).toBeInTheDocument();
     });
 
-    expect(doFieldQuery(submitButtonQuery)).toBeInTheDocument();
+    expect(testableForm.findSubmitButton()).toBeInTheDocument();
   });
 
-  function testPaths(paths: TestPath<TFormData>[], happy: boolean) {
-    paths.forEach(({ name, data }) => {
-      it(name, () => {
-        render(component(mockOnSubmit));
-        fillIn(formShape, data);
+  function testPath(
+    { name, data, renderProps }: TestPath<TFormData>,
+    test: "happy" | "unhappy" | (() => void),
+  ) {
+    it(name, () => {
+      renderForm(renderProps);
+      testableForm.submitData(data);
 
-        fireEvent.click(doFieldQuery(submitButtonQuery));
-
-        if (happy) {
-          expect(mockOnSubmit).toHaveBeenCalledWith(data);
-        } else {
-          expect(mockOnSubmit).not.toHaveBeenCalled();
-        }
-      });
+      if (test === "happy") {
+        expect(mockOnSubmit).toHaveBeenCalledWith(data);
+      } else if (test === "unhappy") {
+        expect(mockOnSubmit).not.toHaveBeenCalled();
+      } else {
+        test();
+      }
     });
   }
 
   describe("calls onSubmit when", () => {
-    testPaths(happyPaths, true);
+    happyPaths.forEach((path) => testPath(path, "happy"));
   });
 
   describe("does not call onSubmit when", () => {
-    testPaths(sadPaths, false);
+    sadPaths.forEach((path) => testPath(path, "unhappy"));
+  });
+
+  describe("shows loading overlay when", () => {
+    testPath(
+      {
+        name: "loading",
+        data: happyPaths[0].data,
+        renderProps: { isLoading: true },
+      },
+      () => {
+        const overlay = testableForm.findLoadingOverlay();
+        expect(overlay).toBeInTheDocument();
+        expect(overlay).toBeVisible();
+      },
+    );
+  });
+
+  describe("does not show loading overlay when", () => {
+    testPath(
+      {
+        name: "not loading",
+        data: happyPaths[0].data,
+      },
+      () => {
+        const overlay = testableForm.findLoadingOverlay();
+        expect(overlay).toBeNull();
+      },
+    );
   });
 }
 
 function makeSadPaths<TFormData extends object>(
+  sadPathFactory: SadPathFactory<TFormData> | undefined,
+  sadPaths: TestPath<TFormData>[],
+  happyPaths: TestPath<TFormData>[],
+) {
+  // Fill sadPaths from received factories
+  if (sadPathFactory)
+    sadPaths.push(...resolveSadPathFactory(happyPaths[0].data, sadPathFactory));
+
+  // Fill sadPaths with disabled and loading paths
+  sadPaths.push(
+    {
+      name: "disabled",
+      data: happyPaths[0].data,
+      renderProps: { isDisabled: true },
+    },
+    {
+      name: "loading",
+      data: happyPaths[0].data,
+      renderProps: { isLoading: true },
+    },
+  );
+}
+
+function resolveSadPathFactory<TFormData extends object>(
   happyData: TFormData,
   factory: SadPathFactory<TFormData>,
 ): TestPath<TFormData>[] {
@@ -97,45 +155,4 @@ function makeSadPaths<TFormData extends object>(
     })) || [];
 
   return [...partials, ...required];
-}
-
-function fillIn<TFormData extends object>(
-  shape: FormShape<TFormData>,
-  data: TFormData,
-) {
-  const elements = doFormQuery(shape);
-  const keys = Object.keys(data) as Array<keyof TFormData>;
-  keys.forEach((key) => {
-    const field = elements[key];
-    const { inputFn } = shape[key];
-    const value = data[key];
-
-    if (inputFn) {
-      inputFn(field, value);
-    } else {
-      fillField(field, value);
-    }
-  });
-}
-
-function doFormQuery<TFormData extends object>(
-  shape: FormShape<TFormData>,
-): FormElements<TFormData> {
-  const keys = Object.keys(shape) as Array<keyof TFormData>;
-  return Object.fromEntries(
-    keys.map((key) => [key, doFieldQuery(shape[key].query)]),
-  ) as FormElements<TFormData>;
-}
-
-function doFieldQuery(query: FieldQuery) {
-  if ("label" in query) {
-    const { label } = query;
-    return screen.getByLabelText(new RegExp(label, "i"));
-  }
-
-  const { role, name } = query;
-  return screen.getByRole(
-    role,
-    name ? { name: new RegExp(name, "i") } : undefined,
-  );
 }
