@@ -4,7 +4,7 @@ import type { FormProps } from "@/types/form-props.ts";
 export interface TestPath<TFormData extends object> {
   name: string;
   data: TFormData;
-  renderProps?: Omit<FormProps<TFormData>, "onSubmit">;
+  renderProps?: FormProps<TFormData>;
 }
 
 export interface SadPathFactory<TFormData extends object> {

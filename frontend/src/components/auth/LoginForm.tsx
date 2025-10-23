@@ -4,10 +4,10 @@ import { zod4Resolver } from "mantine-form-zod-resolver";
 import { loginSchema, type LoginType } from "@/schemes/auth.schema.ts";
 import { Button, PasswordInput, TextInput } from "@mantine/core";
 import type { FormProps } from "@/types/form-props.ts";
-import { BaseForm } from "@/components/BaseForm.tsx";
+import { BaseForm, wrapSubmitFn } from "@/components/BaseForm.tsx";
 
 export const LoginForm: FC<FormProps<LoginType>> = (props = {}) => {
-  const { isDisabled, isLoading, onSubmit = () => {} } = props;
+  const { isDisabled, isLoading, onSubmit } = props;
   const form = useForm<LoginType>({
     mode: "uncontrolled",
     initialValues: {
@@ -19,7 +19,7 @@ export const LoginForm: FC<FormProps<LoginType>> = (props = {}) => {
 
   return (
     <BaseForm
-      onSubmit={form.onSubmit((data) => onSubmit(loginSchema.parse(data)))}
+      onSubmit={wrapSubmitFn(form, onSubmit, loginSchema)}
       isDisabled={isDisabled}
       isLoading={isLoading}
     >

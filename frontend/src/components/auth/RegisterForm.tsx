@@ -9,7 +9,7 @@ import { useForm } from "@mantine/form";
 import { zod4Resolver } from "mantine-form-zod-resolver";
 import { Button, PasswordInput, TextInput } from "@mantine/core";
 import { DateInput } from "@mantine/dates";
-import { BaseForm } from "@/components/BaseForm.tsx";
+import { BaseForm, wrapSubmitFn } from "@/components/BaseForm.tsx";
 
 const PASSWORD_PLACEHOLDER = "*".repeat(MIN_PASSWORD_LENGTH);
 
@@ -17,7 +17,7 @@ type RegisterFormType = Omit<RegisterType, "birthDate"> & {
   birthDate: Date | null;
 };
 export const RegisterForm: FC<FormProps<RegisterType>> = (props = {}) => {
-  const { isDisabled, isLoading, onSubmit = () => {} } = props;
+  const { isDisabled, isLoading, onSubmit } = props;
   const form = useForm<RegisterFormType>({
     mode: "uncontrolled",
     initialValues: {
@@ -33,7 +33,7 @@ export const RegisterForm: FC<FormProps<RegisterType>> = (props = {}) => {
 
   return (
     <BaseForm
-      onSubmit={form.onSubmit((data) => onSubmit(registerSchema.parse(data)))}
+      onSubmit={wrapSubmitFn(form, onSubmit, registerSchema)}
       isDisabled={isDisabled}
       isLoading={isLoading}
     >

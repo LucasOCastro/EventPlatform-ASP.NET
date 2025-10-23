@@ -1,11 +1,15 @@
 import { render } from "@/tests/setup";
-import { vi } from "vitest";
+import { type Mock, vi } from "vitest";
 import type {
   SadPathFactory,
   TestFormSettings,
   TestPath,
 } from "@/tests/forms/forms.d.tsx";
-import type { FormProps } from "@/types/form-props";
+import type {
+  ExposedOnSubmitForm,
+  FormOnSubmit,
+  FormProps,
+} from "@/types/form-props";
 import TestableForm from "@/tests/forms/testable-form";
 
 export function testForm<TFormData extends object>({
@@ -26,7 +30,7 @@ export function testForm<TFormData extends object>({
   // Fill sadPaths
   makeSadPaths(sadPathFactory, sadPaths, happyPaths);
 
-  const mockOnSubmit = vi.fn(async (data: TFormData) =>
+  const mockOnSubmit: Mock<FormOnSubmit<TFormData>> = vi.fn(async (data) =>
     console.log("onSubmit called with:", data),
   );
   beforeEach(() => mockOnSubmit.mockClear());
@@ -62,7 +66,12 @@ export function testForm<TFormData extends object>({
       testableForm.submitData(data);
 
       if (test === "happy") {
-        expect(mockOnSubmit).toHaveBeenCalledWith(data);
+        expect(mockOnSubmit).toHaveBeenCalledWith(
+          data,
+          expect.objectContaining<ExposedOnSubmitForm<TFormData>>(
+            getExpectedFormObject<TFormData>(),
+          ),
+        );
       } else if (test === "unhappy") {
         expect(mockOnSubmit).not.toHaveBeenCalled();
       } else {
@@ -92,6 +101,16 @@ export function testForm<TFormData extends object>({
         expect(overlay).toBeVisible();
       },
     );
+
+    //   const mockedAsyncOnSubmit = jest.fn(() => );
+    //   testPath(
+    //     {
+    //       name: "async onSubmit",
+    //       data: happyPaths[0].data,
+    //       renderProps: { onSubmit: mockedAsyncOnSubmit},
+    //     },
+    //     () => {},
+    //   );
   });
 
   describe("does not show loading overlay when", () => {
@@ -155,4 +174,14 @@ function resolveSadPathFactory<TFormData extends object>(
     })) || [];
 
   return [...partials, ...required];
+}
+
+function getExpectedFormObject<TFormData>(): ExposedOnSubmitForm<TFormData> {
+  return {
+    setErrors: expect.any(Function),
+    setFieldError: expect.any(Function),
+    clearFieldError: expect.any(Function),
+    clearErrors: expect.any(Function),
+    reset: expect.any(Function),
+  };
 }
