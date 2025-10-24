@@ -17,6 +17,7 @@ export type FormElements<TFormData extends object> = Record<
 >;
 
 export default class TestableForm<TFormData extends object> {
+  static readonly LOADING_OVERLAY_TEST_ID = "loading-overlay";
   private readonly _shape: FormShape<TFormData>;
   private readonly _submitButton: FieldQuery;
 
@@ -52,8 +53,15 @@ export default class TestableForm<TFormData extends object> {
     );
   }
 
-  findLoadingOverlay(): HTMLElement | null {
-    return screen.queryByTestId("loading-overlay");
+  expectLoading() {
+    const overlay = screen.getByTestId(TestableForm.LOADING_OVERLAY_TEST_ID);
+    expect(overlay).toBeInTheDocument();
+    expect(overlay).toBeVisible();
+  }
+
+  expectNotLoading() {
+    const overlay = screen.queryByTestId(TestableForm.LOADING_OVERLAY_TEST_ID);
+    expect(overlay).toBeNull();
   }
 
   fillWithData(data: TFormData) {

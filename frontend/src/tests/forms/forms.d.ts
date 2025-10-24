@@ -4,7 +4,7 @@ import type { FormProps } from "@/types/form-props.ts";
 export interface TestPath<TFormData extends object> {
   name: string;
   data: TFormData;
-  renderProps?: FormProps<TFormData>;
+  renderProps?: Omit<FormProps<TFormData>, "onSubmit">;
 }
 
 export interface SadPathFactory<TFormData extends object> {
@@ -19,4 +19,10 @@ export interface TestFormSettings<TFormData extends object> {
   happyPaths: TestPath<TFormData>[] | TestPath<TFormData>;
   sadPaths?: TestPath<TFormData>[] | TestPath<TFormData>;
   sadPathFactory?: SadPathFactory<TFormData>;
+}
+
+export interface TestPathHooks {
+  setup?: () => Promise<void> | void;
+  customTest?: () => Promise<void> | void;
+  cleanup?: () => Promise<void> | void;
 }

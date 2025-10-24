@@ -4,6 +4,7 @@ import type {
   SadPathFactory,
   TestFormSettings,
   TestPath,
+  TestPathHooks,
 } from "@/tests/forms/forms.d.tsx";
 import type {
   ExposedOnSubmitForm,
@@ -30,9 +31,7 @@ export function testForm<TFormData extends object>({
   // Fill sadPaths
   makeSadPaths(sadPathFactory, sadPaths, happyPaths);
 
-  const mockOnSubmit: Mock<FormOnSubmit<TFormData>> = vi.fn(async (data) =>
-    console.log("onSubmit called with:", data),
-  );
+  const mockOnSubmit: Mock<FormOnSubmit<TFormData>> = vi.fn();
   beforeEach(() => mockOnSubmit.mockClear());
 
   function renderForm(props: Omit<FormProps<TFormData>, "onSubmit"> = {}) {
@@ -59,24 +58,29 @@ export function testForm<TFormData extends object>({
 
   function testPath(
     { name, data, renderProps }: TestPath<TFormData>,
-    test: "happy" | "unhappy" | (() => void),
+    testType: "happy" | "unhappy" | "custom",
+    { setup, customTest, cleanup }: TestPathHooks = {},
   ) {
-    it(name, () => {
+    it(name, async () => {
+      await setup?.();
+
       renderForm(renderProps);
       testableForm.submitData(data);
 
-      if (test === "happy") {
+      if (testType === "happy") {
         expect(mockOnSubmit).toHaveBeenCalledWith(
           data,
           expect.objectContaining<ExposedOnSubmitForm<TFormData>>(
             getExpectedFormObject<TFormData>(),
           ),
         );
-      } else if (test === "unhappy") {
+      } else if (testType === "unhappy") {
         expect(mockOnSubmit).not.toHaveBeenCalled();
-      } else {
-        test();
+      } else if (testType === "custom") {
+        await customTest?.();
       }
+
+      await cleanup?.();
     });
   }
 
@@ -95,22 +99,40 @@ export function testForm<TFormData extends object>({
         data: happyPaths[0].data,
         renderProps: { isLoading: true },
       },
-      () => {
-        const overlay = testableForm.findLoadingOverlay();
-        expect(overlay).toBeInTheDocument();
-        expect(overlay).toBeVisible();
-      },
+      "custom",
+      { customTest: testableForm.expectLoading },
     );
 
-    //   const mockedAsyncOnSubmit = jest.fn(() => );
-    //   testPath(
-    //     {
-    //       name: "async onSubmit",
-    //       data: happyPaths[0].data,
-    //       renderProps: { onSubmit: mockedAsyncOnSubmit},
-    //     },
-    //     () => {},
-    //   );
+    testPath(
+      {
+        name: "async onSubmit",
+        data: happyPaths[0].data,
+      },
+      "custom",
+      {
+        setup() {
+          vi.useFakeTimers();
+          mockOnSubmit.mockImplementationOnce(
+            async () =>
+              await new Promise((resolve) => setTimeout(resolve, 1000)),
+          );
+        },
+        async customTest() {
+          async function innerTest() {
+            await new Promise((resolve) => setTimeout(resolve, 500));
+            testableForm.expectLoading();
+            await new Promise((resolve) => setTimeout(resolve, 501));
+            testableForm.expectNotLoading();
+          }
+
+          innerTest();
+          await vi.runAllTimersAsync();
+        },
+        cleanup() {
+          vi.useRealTimers();
+        },
+      },
+    );
   });
 
   describe("does not show loading overlay when", () => {
@@ -119,10 +141,8 @@ export function testForm<TFormData extends object>({
         name: "not loading",
         data: happyPaths[0].data,
       },
-      () => {
-        const overlay = testableForm.findLoadingOverlay();
-        expect(overlay).toBeNull();
-      },
+      "custom",
+      { customTest: testableForm.expectNotLoading },
     );
   });
 }
