@@ -12,6 +12,7 @@ import type {
   FormProps,
 } from "@/types/form-props";
 import TestableForm from "@/tests/forms/testable-form";
+import { act } from "@testing-library/react";
 
 export function testForm<TFormData extends object>({
   component,
@@ -65,7 +66,9 @@ export function testForm<TFormData extends object>({
       await setup?.();
 
       renderForm(renderProps);
-      testableForm.submitData(data);
+      act(() => {
+        testableForm.submitData(data);
+      });
 
       if (testType === "happy") {
         expect(mockOnSubmit).toHaveBeenCalledWith(
@@ -126,7 +129,9 @@ export function testForm<TFormData extends object>({
           }
 
           innerTest();
-          await vi.runAllTimersAsync();
+          await act(async () => {
+            await vi.runAllTimersAsync();
+          });
         },
         cleanup() {
           vi.useRealTimers();
