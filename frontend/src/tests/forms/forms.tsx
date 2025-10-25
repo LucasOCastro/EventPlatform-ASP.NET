@@ -1,5 +1,5 @@
 import { render } from "@/tests/setup";
-import { type Mock, vi } from "vitest";
+import { expect, type Mock, vi } from "vitest";
 import type {
   SadPathFactory,
   TestFormSettings,
@@ -150,6 +150,20 @@ export function testForm<TFormData extends object>({
       { customTest: testableForm.expectNotLoading },
     );
   });
+
+  it("shows top level error message", async () => {
+    const TEST_MESSAGE = "top level error test message";
+    mockOnSubmit.mockImplementationOnce((_, form) =>
+      form.setTopLevelError(TEST_MESSAGE),
+    );
+
+    renderForm();
+    act(() => testableForm.submitData(happyPaths[0].data));
+    await testableForm.expectErrorMessage(TEST_MESSAGE);
+
+    act(() => testableForm.submitData(happyPaths[0].data));
+    testableForm.expectNotError(TEST_MESSAGE);
+  });
 }
 
 function makeSadPaths<TFormData extends object>(
@@ -208,5 +222,7 @@ function getExpectedFormObject<TFormData>(): ExposedOnSubmitForm<TFormData> {
     clearFieldError: expect.any(Function),
     clearErrors: expect.any(Function),
     reset: expect.any(Function),
+    setTopLevelError: expect.any(Function),
+    clearTopLevelError: expect.any(Function),
   };
 }

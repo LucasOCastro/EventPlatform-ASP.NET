@@ -64,6 +64,17 @@ export default class TestableForm<TFormData extends object> {
     expect(overlay).toBeNull();
   }
 
+  async expectErrorMessage(message: string) {
+    const element = await screen.findByText(message);
+    expect(element).toBeInTheDocument();
+    expect(element).toBeVisible();
+  }
+
+  expectNotError(message: string) {
+    const element = screen.queryByText(message);
+    expect(element).toBeNull();
+  }
+
   fillWithData(data: TFormData) {
     const shape = this._shape;
     const elements = this.findAllFields();

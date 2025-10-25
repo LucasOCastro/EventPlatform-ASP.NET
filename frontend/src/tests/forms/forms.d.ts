@@ -1,5 +1,6 @@
 import type { ReactElement } from "react";
 import type { FormProps } from "@/types/form-props.ts";
+import type { FormShape } from "@/tests/forms/testable-form.ts";
 
 export interface TestPath<TFormData extends object> {
   name: string;

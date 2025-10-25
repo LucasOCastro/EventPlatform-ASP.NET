@@ -14,6 +14,8 @@ interface ErrorResponse {
   message: string;
   // TODO handle multiple errors - toast?
   // errors: string[];
+
+  //TODO include retryable
 }
 
 export class FetchRequestService implements IRequestService {
