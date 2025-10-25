@@ -55,6 +55,9 @@ export const RegisterForm: FC<FormProps<RegisterType>> = (props = {}) => {
         key={form.key("confirmPassword")}
         {...form.getInputProps("confirmPassword")}
       />
+
+      <BaseForm.FormError />
+
       <TextInput
         label="First Name"
         key={form.key("firstName")}

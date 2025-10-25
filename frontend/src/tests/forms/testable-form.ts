@@ -68,6 +68,7 @@ export default class TestableForm<TFormData extends object> {
     const element = await screen.findByText(message);
     expect(element).toBeInTheDocument();
     expect(element).toBeVisible();
+    return element;
   }
 
   expectNotError(message: string) {

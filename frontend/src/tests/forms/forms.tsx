@@ -21,6 +21,7 @@ export function testForm<TFormData extends object>({
   sadPaths,
   submitButton,
   sadPathFactory,
+  customTest
 }: TestFormSettings<TFormData>) {
   // Guarantee happyPaths is an array
   if (!Array.isArray(happyPaths)) happyPaths = [happyPaths];
@@ -164,6 +165,8 @@ export function testForm<TFormData extends object>({
     act(() => testableForm.submitData(happyPaths[0].data));
     testableForm.expectNotError(TEST_MESSAGE);
   });
+
+  customTest?.({testableForm, renderForm, mockOnSubmit});
 }
 
 function makeSadPaths<TFormData extends object>(

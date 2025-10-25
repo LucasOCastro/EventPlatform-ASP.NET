@@ -60,11 +60,18 @@ export const BaseForm = <TFormData, TData = TFormData>(
     });
   });
 
-  const hasDefinedErrorElement = React.Children.toArray(children).some(
-    (c) =>
-      React.isValidElement(c) &&
-      (c.type as FormErrorComponent).__IS_FORM_ERROR__,
-  );
+  function hasFormErrorElement(nodes: React.ReactNode): boolean {
+    if (!nodes) return false;
+
+    return React.Children.toArray(nodes).some((child) => {
+      if (!React.isValidElement(child)) return false;
+      if ((child.type as FormErrorComponent).__IS_FORM_ERROR__) return true;
+
+      const props = child.props as { children: React.ReactNode };
+      return hasFormErrorElement(props.children);
+    });
+  }
+  const hasDefinedErrorElement = hasFormErrorElement(children);
 
   return (
     <form
