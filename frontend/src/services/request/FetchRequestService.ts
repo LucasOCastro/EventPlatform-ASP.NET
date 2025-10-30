@@ -97,10 +97,10 @@ export class FetchRequestService implements IRequestService {
     try {
       res = await fetch(url, options);
     } catch (err) {
+      this._logger.error(`Fetch error for ${url}:`,  JSON.stringify(err));
+
       const isAbort =
         err && typeof err === "object" && (err as Error).name === "AbortError";
-
-      this._logger.error(`Fetch error for ${url}:`, err);
       throw isAbort
         ? new TimeoutError("Request timed out: " + url, err)
         : new ConnectionError("Network error while fetching: " + url, err);
@@ -123,7 +123,7 @@ export class FetchRequestService implements IRequestService {
     }
   }
 
-  private async _extractErrorMessages(res: Response) {
+    private async _extractErrorMessages(res: Response) {
     try {
       const data = (await res.json()) as Partial<ErrorResponse>;
       if (data.message) return data.message;

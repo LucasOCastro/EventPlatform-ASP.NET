@@ -34,49 +34,52 @@ describe("FetchRequestService", () => {
 
     const returnsData = happyStatus !== 204;
 
-    it(`should handle a successful ${verb} request`, async () => {
-      const mockData = returnsData ? { id: 1, name: "test item" } : null;
-      const response = returnsData ? JSON.stringify(mockData) : undefined;
-      fetchMock.mockResponseOnce(response, { status: happyStatus });
+    describe(`${verb}`, () => {
+        it(`should handle a successful request`, async () => {
+          const mockData = returnsData ? { id: 1, name: "test item" } : null;
+          const response = returnsData ? JSON.stringify(mockData) : undefined;
+          fetchMock.mockResponseOnce(response, { status: happyStatus });
 
-      const result = await fn(URL, options);
+          const result = await fn(URL, options);
 
-      expect(fetchMock).toHaveBeenCalledWith(
-        URL,
-        expect.objectContaining({
-          method: verb,
-          headers: {},
-          ...expectedCallParam,
-        }),
-      );
-
-      expect(result).toEqual(mockData);
-    });
-
-    it(`should throw a HTTP error with custom message for a failed ${verb} request`, async () => {
-      const promises = Object.entries(NetworkErrors).map(
-        async ([status, error]) => {
-          fetchMock.mockResponseOnce(
-            JSON.stringify({
-              message: ERROR_MESSAGE,
+          expect(fetchMock).toHaveBeenCalledWith(
+            URL,
+            expect.objectContaining({
+              method: verb,
+              headers: {},
+              ...expectedCallParam,
             }),
-            {
-              status: Number(status),
+          );
+
+          expect(result).toEqual(mockData);
+        });
+
+        it(`should throw a HTTP error with custom message for a failed request`, async () => {
+          const promises = Object.entries(NetworkErrors).map(
+            async ([status, error]) => {
+              fetchMock.mockResponseOnce(
+                JSON.stringify({
+                  message: ERROR_MESSAGE,
+                }),
+                {
+                  status: Number(status),
+                },
+              );
+              await expect(fn(URL)).rejects.toThrow(new error(ERROR_MESSAGE));
             },
           );
-          await expect(fn(URL)).rejects.toThrow(new error(ERROR_MESSAGE));
-        },
-      );
-      await Promise.all(promises);
-    });
+          await Promise.all(promises);
+        });
 
-    it(`should throw a TimeoutError for a timed out ${verb} request`, async () => {
-      fetchMock.mockAbortOnce();
+        it(`should throw a TimeoutError for a timed out request`, async () => {
+          fetchMock.mockAbortOnce();
 
-      await expect(fn(URL, { ...options, timeout: TIMEOUT })).rejects.toThrow(
-        TimeoutError,
-      );
-    });
+          await expect(fn(URL, { ...options, timeout: TIMEOUT })).rejects.toThrow(
+            TimeoutError,
+          );
+        });
+    })
+
   }
 
   testVerb({
