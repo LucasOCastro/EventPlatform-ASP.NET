@@ -21,7 +21,7 @@ export function testForm<TFormData extends object>({
   sadPaths,
   submitButton,
   sadPathFactory,
-  customTest
+  customTest,
 }: TestFormSettings<TFormData>) {
   // Guarantee happyPaths is an array
   if (!Array.isArray(happyPaths)) happyPaths = [happyPaths];
@@ -81,7 +81,12 @@ export function testForm<TFormData extends object>({
       } else if (testType === "unhappy") {
         expect(mockOnSubmit).not.toHaveBeenCalled();
       } else if (testType === "custom") {
-        await customTest?.();
+        try {
+          await customTest?.();
+        } catch (e) {
+          await cleanup?.();
+          throw e;
+        }
       }
 
       await cleanup?.();
@@ -120,19 +125,13 @@ export function testForm<TFormData extends object>({
             async () =>
               await new Promise((resolve) => setTimeout(resolve, 1000)),
           );
+          testableForm.expectNotLoading();
         },
         async customTest() {
-          async function innerTest() {
-            await new Promise((resolve) => setTimeout(resolve, 500));
-            testableForm.expectLoading();
-            await new Promise((resolve) => setTimeout(resolve, 501));
-            testableForm.expectNotLoading();
-          }
-
-          innerTest();
-          await act(async () => {
-            await vi.runAllTimersAsync();
-          });
+          await act(async () => await vi.advanceTimersByTimeAsync(500));
+          testableForm.expectLoading();
+          await act(async () => await vi.advanceTimersByTimeAsync(505));
+          testableForm.expectNotLoading();
         },
         cleanup() {
           vi.useRealTimers();
@@ -166,7 +165,7 @@ export function testForm<TFormData extends object>({
     testableForm.expectNotError(TEST_MESSAGE);
   });
 
-  customTest?.({testableForm, renderForm, mockOnSubmit});
+  customTest?.({ testableForm, renderForm, mockOnSubmit });
 }
 
 function makeSadPaths<TFormData extends object>(

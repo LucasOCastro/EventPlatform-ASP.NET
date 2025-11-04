@@ -114,13 +114,13 @@ describe("AuthModal", () => {
     expect(getLoginContent()).toBeVisible();
     expect(getRegisterContent()).not.toBeVisible();
 
-    await act(() => fireEvent.click(registerTab));
+    await act(async () => fireEvent.click(registerTab));
     await waitFor(() => {
       expect(getLoginContent()).not.toBeVisible();
       expect(getRegisterContent()).toBeVisible();
     });
 
-    await act(() => fireEvent.click(loginTab));
+    await act(async () => fireEvent.click(loginTab));
     await waitFor(() => {
       expect(getLoginContent()).toBeVisible();
       expect(getRegisterContent()).not.toBeVisible();
@@ -150,7 +150,7 @@ describe("AuthModal", () => {
       serviceCall.mockRejectedValueOnce(error);
 
       await router.expectRouteActive("/auth");
-      await act(() => fireEvent.click(button()));
+      await act(async () => fireEvent.click(button()));
       await router.expectRouteActive("/auth");
 
       if (field)
@@ -169,7 +169,7 @@ describe("AuthModal", () => {
       render(router.render("/auth"));
 
       await router.expectRouteActive("/auth");
-      await act(() => fireEvent.click(getLoginContent()));
+      await act(async () => fireEvent.click(getLoginContent()));
       expect(authServiceMock.login).toHaveBeenCalled();
       await router.expectRouteActive("/dashboard");
     });

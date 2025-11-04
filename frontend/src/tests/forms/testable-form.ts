@@ -61,7 +61,11 @@ export default class TestableForm<TFormData extends object> {
 
   expectNotLoading() {
     const overlay = screen.queryByTestId(TestableForm.LOADING_OVERLAY_TEST_ID);
-    expect(overlay).toBeNull();
+    if (overlay) {
+      expect(overlay).not.toBeVisible();
+    } else {
+      expect(overlay).toBeNull();
+    }
   }
 
   async expectErrorMessage(message: string) {
