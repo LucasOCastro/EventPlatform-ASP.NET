@@ -1,7 +1,7 @@
 import type { IAuthService } from "@/services/auth/IAuthService.ts";
 import { AuthService } from "@/services/auth/AuthService.ts";
-import { RequestServiceMock } from "@/tests/mocks/RequestService.mock.ts";
-import { LoggerMock } from "@/tests/mocks/Logger.mock.ts";
+import { RequestServiceMock } from "@/tests/mocks/services/RequestService.mock.ts";
+import { LoggerMock } from "@/tests/mocks/services/Logger.mock.ts";
 import type { LoginType, RegisterType } from "@/schemes/auth.schema.ts";
 import type { UserProfile } from "@/schemes/user.schema.ts";
 import { ZodError } from "zod";

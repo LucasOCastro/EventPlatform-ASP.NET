@@ -1,5 +1,5 @@
 import { createRoutesStub, type RoutesTestStubProps } from "react-router";
-import React from "react";
+import React, {type FC} from "react";
 import { screen } from "@testing-library/react";
 
 type RouteObject<TPath extends string> = { path: TPath; Component: React.FC };
@@ -19,20 +19,27 @@ export class RouterMock<TPath extends string> {
 
   public async expectRouteActive(route: TPath): Promise<void> {
     const testId = makeTestId(route);
-    return expect(await screen.findByTestId(testId)).toBeInTheDocument();
+    const element = await screen.findByTestId(testId);
+    expect(element).toBeInTheDocument();
+    expect(element).toBeVisible();
   }
 }
 
 function makeRouteObject<TPath extends string>(
   route: Route<TPath>,
 ): RouteObject<TPath> {
-  if (typeof route !== "string") {
-    return route;
-  }
+  const path = typeof route === "string" ? route : route.path;
+  const InnerComponent = typeof route === "string" ? () => null : route.Component;
+
+  const WrappedComponent: FC = () => (
+      <div data-testid={makeTestId(path)}>
+        <InnerComponent />
+      </div>
+  );
 
   return {
-    path: route,
-    Component: () => <div data-testid={makeTestId(route)} />,
+    path,
+    Component: WrappedComponent,
   };
 }
 

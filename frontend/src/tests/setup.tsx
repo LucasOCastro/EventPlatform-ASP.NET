@@ -7,7 +7,7 @@ import "@testing-library/jest-dom";
 import "@testing-library/jest-dom/vitest";
 import createFetchMock from "vitest-fetch-mock";
 import "@/plugins/setup";
-import { authServiceMock } from "@/tests/mocks/AuthService.mock.ts";
+import { authServiceMock } from "@/tests/mocks/services/AuthService.mock.ts";
 import AuthProvider from "@/contexts/AuthProvider.tsx";
 import nodeFetch, { Request, Response } from "node-fetch";
 
