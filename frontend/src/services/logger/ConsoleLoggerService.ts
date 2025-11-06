@@ -2,7 +2,7 @@ import type { ILogger, LogLevel } from "@/services/logger/ILogger.ts";
 
 export class ConsoleLoggerService implements ILogger {
   log(level: LogLevel, ...data: unknown[]): void {
-    console[level](this._getPrefix(level), ...data.map(this._stringify));
+    console[level](this._getPrefix(level), ...data);
   }
 
   info(...data: unknown[]): void {
@@ -21,9 +21,5 @@ export class ConsoleLoggerService implements ILogger {
 
   private _getPrefix(level: LogLevel): string {
     return `[${level.toUpperCase()}]`;
-  }
-
-  private _stringify(data: unknown): string {
-    return typeof data === "string" ? data : JSON.stringify(data);
   }
 }

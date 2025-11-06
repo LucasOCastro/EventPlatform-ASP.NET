@@ -17,17 +17,6 @@ const LOG_DATA = [
   null,
 ];
 
-const STRING_DATA = [
-  "test",
-  "1",
-  "3",
-  "append 5.63",
-  Date.now().toString(),
-  '{"test":"data","inner":{"foo":"bar","a":3}}',
-  '[1,3,"asd"]',
-  "null",
-];
-
 describe("ConsoleLoggerService", () => {
   let logger: ILogger;
   const methodKeys = LogLevels.map((level) =>
@@ -50,11 +39,11 @@ describe("ConsoleLoggerService", () => {
       const prefix = `[${key.toUpperCase()}]`;
       it("should call the console method in the log method", async () => {
         logger.log(key, ...LOG_DATA);
-        expect(consoleSpy[key]).toHaveBeenCalledWith(prefix, ...STRING_DATA);
+        expect(consoleSpy[key]).toHaveBeenCalledWith(prefix, ...LOG_DATA);
       });
       it("should call the console method in the specific method", async () => {
         logger[key](...LOG_DATA);
-        expect(consoleSpy[key]).toHaveBeenCalledWith(prefix, ...STRING_DATA);
+        expect(consoleSpy[key]).toHaveBeenCalledWith(prefix, ...LOG_DATA);
       });
     });
   });
