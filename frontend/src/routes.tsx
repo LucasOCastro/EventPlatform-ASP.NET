@@ -4,10 +4,15 @@ import { About } from "@/pages/about/About.tsx";
 import { ErrorPage } from "@/pages/error-page/ErrorPage.tsx";
 import { Root } from "@/pages/Root.tsx";
 import type { MyRouteObject, RouteInfo } from "@/types/routes.ts";
+import { ModalsProvider } from "@mantine/modals";
 
 const routeRoot: MyRouteObject = {
   path: "/",
-  element: <Root />,
+  element: (
+    <ModalsProvider>
+      <Root />
+    </ModalsProvider>
+  ),
   errorElement: <ErrorPage />,
   children: [
     {

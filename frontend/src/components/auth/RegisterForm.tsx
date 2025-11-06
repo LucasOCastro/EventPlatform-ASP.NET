@@ -28,6 +28,7 @@ export const RegisterForm: FC<FormProps<RegisterType>> = (props = {}) => {
       birthDate: null,
     },
     validate: zod4Resolver(registerSchema),
+    validateInputOnChange: true,
   });
 
   return (
@@ -55,9 +56,6 @@ export const RegisterForm: FC<FormProps<RegisterType>> = (props = {}) => {
         key={form.key("confirmPassword")}
         {...form.getInputProps("confirmPassword")}
       />
-
-      <BaseForm.FormError />
-
       <TextInput
         label="First Name"
         key={form.key("firstName")}
