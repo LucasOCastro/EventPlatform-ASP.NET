@@ -1,10 +1,10 @@
-import type { ILogger } from "@/services/logger/ILogger.ts";
-import { vi } from "vitest";
+import type { ILogger, LogLevel } from "@/services/logger/ILogger.ts";
+import { type Mock, vi } from "vitest";
 
 export class LoggerMock implements ILogger {
-  debug = vi.fn();
-  error = vi.fn();
-  info = vi.fn();
-  log = vi.fn();
-  warn = vi.fn();
+  log: Mock<(logLevel: LogLevel, ...data: unknown[]) => void> = vi.fn();
+  debug: Mock<(...data: unknown[]) => void> = vi.fn();
+  error: Mock<(...data: unknown[]) => void> = vi.fn();
+  info: Mock<(...data: unknown[]) => void> = vi.fn();
+  warn: Mock<(...data: unknown[]) => void> = vi.fn();
 }

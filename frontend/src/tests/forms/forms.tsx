@@ -14,6 +14,7 @@ import type {
 import TestableForm from "@/tests/forms/testable-form";
 import { act } from "@testing-library/react";
 
+// TODO support error message testing
 export function testForm<TFormData extends object>({
   component,
   formShape,

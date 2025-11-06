@@ -8,7 +8,7 @@ import {
 import { ConnectionError, TimeoutError, makeHttpError } from "@/errors";
 import type { ILogger } from "@/services/logger/ILogger.ts";
 
-const DEFAULT_TIMEOUT = 5 * 1000;
+export const DEFAULT_TIMEOUT = 5 * 1000;
 
 interface ErrorResponse {
   message: string;
@@ -97,7 +97,7 @@ export class FetchRequestService implements IRequestService {
     try {
       res = await fetch(url, options);
     } catch (err) {
-      this._logger.error(`Fetch error for ${url}:`,  JSON.stringify(err));
+      this._logger.error(`Fetch error for ${url}:`, err);
 
       const isAbort =
         err && typeof err === "object" && (err as Error).name === "AbortError";
@@ -114,16 +114,17 @@ export class FetchRequestService implements IRequestService {
     if (!this._returnsData(res)) return null;
 
     try {
-      return res.json();
+      return await res.json();
     } catch (err) {
-      this._logger.error(`Invalid JSON response from ${url}:`, err);
+      this._logger.error(`Invalid JSON response from ${url}:`, res);
       throw new Error(
         `Invalid JSON response (status ${res.status}) from ${url}`,
+        { cause: err },
       );
     }
   }
 
-    private async _extractErrorMessages(res: Response) {
+  private async _extractErrorMessages(res: Response) {
     try {
       const data = (await res.json()) as Partial<ErrorResponse>;
       if (data.message) return data.message;

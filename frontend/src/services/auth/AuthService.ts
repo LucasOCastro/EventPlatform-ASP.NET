@@ -8,6 +8,7 @@ import type { IRequestService } from "@/services/request/IRequestService.ts";
 export class AuthService implements IAuthService {
   private readonly _requestService: IRequestService;
   private readonly _logger: ILogger;
+  // TODO try to login from cookies?
   private _user: UserProfile | null = null;
 
   constructor(requestService: IRequestService, logger: ILogger) {
