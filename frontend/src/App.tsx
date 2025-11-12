@@ -4,7 +4,7 @@ import "@mantine/dates/styles.css";
 import "@/plugins/setup";
 import { MantineProvider } from "@mantine/core";
 import { RouterProvider } from "react-router";
-import { router } from "@/routes.tsx";
+import { router } from "@/config/routes.tsx";
 import { LocaleProvider } from "@/contexts/LocaleProvider.tsx";
 import AuthProvider from "@/contexts/AuthProvider.tsx";
 import { registry } from "@/ioc";

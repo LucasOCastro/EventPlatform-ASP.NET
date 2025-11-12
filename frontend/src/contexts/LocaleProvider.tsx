@@ -16,7 +16,9 @@ interface LocaleContextType {
 async function getZodLocale(
   locale: string,
 ): Promise<() => Partial<$ZodConfig>> {
-  try {
+  const { default: defaultLocale } = await import(`zod/v4/locales/en.js`);
+  return defaultLocale;
+  /*try {
     const { default: zodLocale } = await import(`zod/v4/locales/${locale}.js`);
     return zodLocale;
   } catch (error) {
@@ -24,7 +26,7 @@ async function getZodLocale(
 
     const { default: defaultLocale } = await import(`zod/v4/locales/en.js`);
     return defaultLocale;
-  }
+  }*/
 }
 
 const LocaleContext = createContext<LocaleContextType | undefined>(undefined);

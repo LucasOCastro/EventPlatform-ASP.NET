@@ -1,4 +1,6 @@
 export class HttpError extends Error {
+  //TODO include retryable?
+
   public static statusCode?: number;
   public statusCode: number;
 
